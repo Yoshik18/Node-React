@@ -7,11 +7,12 @@ let session = require('express-session');
 let FileStore = require('session-file-store')(session);
 let passport = require('passport');
 let authenticate = require('./authenticate');
+let config = require('./config');
 
 const mongoose = require('mongoose');
 const Dishes = require('./models/dishes');
 
-const url = 'mongodb://localhost:27017/conFusion';
+const url = config.mongoUrl;
 const connect = mongoose.connect(url, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
@@ -43,32 +44,33 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 // app.use(cookieParser('1234-5678-8765-4321'));
 
-app.use(
-  session({
-    name: 'session-id',
-    secret: '1234-5678-8765-4321',
-    saveUninitialized: false,
-    resave: false,
-    store: new FileStore(),
-  })
-);
+//Using JSON Web Tokens
+// app.use(
+//   session({
+//     name: 'session-id',
+//     secret: '1234-5678-8765-4321',
+//     saveUninitialized: false,
+//     resave: false,
+//     store: new FileStore(),
+//   })
+// );
 
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-function auth(req, res, next) {
-  if (!req.user) {
-    let err = new Error('You Are Not Authenticated');
-    err.status = 403;
-    return next(err);
-  } else {
-    next();
-  }
-}
-app.use(auth);
+// function auth(req, res, next) {
+//   if (!req.user) {
+//     let err = new Error('You Are Not Authenticated');
+//     err.status = 403;
+//     return next(err);
+//   } else {
+//     next();
+//   }
+// }
+// app.use(auth);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
